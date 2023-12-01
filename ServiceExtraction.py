@@ -1,65 +1,46 @@
 import json
 import sys
-from spyne import Application, rpc, ServiceBase, Unicode, Array, Float
-from spyne.protocol.soap import Soap11
-from spyne.server.wsgi import WsgiApplication
-from spyne.util.wsgi_wrapper import run_twisted
-from suds.client import Client
+from fastapi import FastAPI
+import requests
 
-class ServiceExtraction(ServiceBase):
-    @rpc(Unicode,_returns=(Unicode, Unicode, Unicode, Unicode, Unicode ,float, Unicode, Unicode, Unicode))
-    def Extraction_donne_client(ctx,file_name):
-        try:
+app = FastAPI()
+
+@app.post("/extractionData/")
+async def Extract_donnee_client(data: dict):
+    file_path = data.get("file_path")
+    print(file_path)
+    """
+    try:
             # Lire les données depuis le fichier JSON
-            with open(file_name, "r") as f:
-                data = json.load(f)
+            with open(file_path, "r") as f:
+                demande = json.load(f)
 
             # Vérifier s'il y a des demandes dans le fichier
-            if data:
+            if demande:
 
-                print(data) 
-                return data["Nom du Client"], data["Prenom du Client"], data["Ville"], data["Email"],data["Type"],float(data["Montant"]), data["Nombre de pieces"], data["Revenu"], data["Depenses"]
                 
-
+                data_client = {
+                  "Nom du Client": demande["nom"],
+                  "Prenom du Client": demande["prenom"],
+                  "Ville" : demande["ville"],
+                  "Email" : demande["email"],
+                  "Type": demande["type_immobilier"],
+                  "Montant": float(demande["montant"]),
+                  "Nombre de pieces": demande["nombre de pieces"],
+                  "Revenu": demande["revenu"],
+                  "Depenses": demande["depenses"]
+                }
+                print(data_client)
+                
+                response = requests.post("http://127.0.0.1:8002/extractionData/", json = data_client)
+                if response.status_code == 200:
+                    print(f"File successfully sent.")
+                else:
+                    print(f"Failed to send file. Status code: {response.status_code}")
+                
             else:
                 return "Aucune demande de nom trouvée ."
-        except (json.JSONDecodeError, FileNotFoundError) as e:
+    except (json.JSONDecodeError, FileNotFoundError) as e:
             return f"Erreur lors de la lecture du fichier : {str(e)}"
-        
-         
-
-application = Application([ServiceExtraction],
-                          tns='spyne.examples.extraction',
-                          in_protocol=Soap11(validator='lxml'),
-                          out_protocol=Soap11()
-                          )
-
-
-if __name__ == '__main__':
-    wsgi_app = WsgiApplication(application)
-    twisted_apps = [
-        (wsgi_app, b'ServiceExtractionClient'),
-    ]
-    sys.exit(run_twisted(twisted_apps, 8002))
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-# Ouvrir le fichier JSON
-#with open('demande.json', 'r') as json_file:
- #   data = json.load(json_file)
-    
-#print(data)
+    """
+    return {"message": "File path received successfully"}
