@@ -41,13 +41,15 @@ async def orchestration(data: Demande):
         "depenses" : demande["Depenses"]
     }
     response = requests.get("http://127.0.0.1:8003/ServiceSolvabilite/", json=data)
-    solvabilite_score = float(response.json().get("score"))
-    
-    if solvabilite_score == -1:
-        print("Vous n'êtes pas enregistré dans la banque.")
-        return("Vous n'êtes pas enregistré dans la banque.")
+    if response.status_code == 200:
+        solvabilite_score = float(response.json().get("score"))
+        
+        if solvabilite_score == -1:
+            print("Vous n'êtes pas enregistré dans la banque.")
+        else:
+            print(solvabilite_score)
     else:
-        print(solvabilite_score)
+        print(f"Failed to connect to solvabilite service. Status code: {response.status_code}")
     
     # Service de propriete
     data = {
@@ -58,8 +60,11 @@ async def orchestration(data: Demande):
     }
 
     response = requests.get("http://127.0.0.1:8004/ServicePropriete/", json=data)
-    propriete_score = float(response.json().get("score"))
-    print(propriete_score)
+    if response.status_code == 200:
+        propriete_score = float(response.json().get("score"))
+        print(propriete_score)
+    else : 
+        print(f"Failed to connect to propriete service. Status code: {response.status_code}")
 
     ##decision final
     data = {
@@ -68,24 +73,28 @@ async def orchestration(data: Demande):
     }
     
     response = requests.get("http://127.0.0.1:8005/ServiceDecision/", json=data)
-    decision = bool(response.json().get("decision"))
-
+    if response.status_code == 200:
+        decision = bool(response.json().get("decision"))
+    else:
+        print(f"Failed to connect to decision service. Status code: {response.status_code}")
+    print(solvabilite_score)
     #enregistrement de la décision
     nom =demande["Nom du Client"]
     prenom = demande["Prenom du Client"]
     email = demande["Email"]
-    file_name = f"{nom + prenom}.json"  
-    file_path = os.path.join("ResultatDemandes", file_name) 
+    if solvabilite_score != -1: 
+        file_name = f"{nom + prenom}.json"  
+        file_path = os.path.join("ResultatDemandes", file_name) 
 
-    resultat_data = {
-        "Nom du Client": nom,
-        "Prenom du Client": prenom,
-        "Email" : email,
-        "Reponse": "Pret accorde" if decision else "Pret refuse"
-    }
+        resultat_data = {
+            "Nom du Client": nom,
+            "Prenom du Client": prenom,
+            "Email" : email,
+            "Reponse": "Pret accorde" if decision else "Pret refuse"
+        }
 
-    with open(file_path, "w") as f:
-        json.dump(resultat_data, f, indent=4)
+        with open(file_path, "w") as f:
+            json.dump(resultat_data, f, indent=4)
     
     #Envoie du mail
     email_sender = 'yassinesoatp@gmail.com'
@@ -94,11 +103,15 @@ async def orchestration(data: Demande):
     email_recever = email
 
     subject = "Décision final pour votre demande"
-    if(decision):
-        body ="Nous avons le plaisir de vous informer que votre demande de pret immobilier a été accordée "
-    else :
-        body = "Nous avons le regret de vous informer que votre demande de pret immobilier a été refusé"
+    if solvabilite_score != -1:
+        if(decision):
+            body ="Nous avons le plaisir de vous informer que votre demande de pret immobilier a été accordée "
+        else :
+            body = "Nous avons le regret de vous informer que votre demande de pret immobilier a été refusé"
+    else: 
+        body = "Votre demande n'a pas pu être traité pour motif: Vous n'êtes pas enregistré dans la banque."  
         
+
     em = EmailMessage()
     em['From'] = email_sender
     em['To'] = email_recever
@@ -111,6 +124,7 @@ async def orchestration(data: Demande):
         smtp.login(email_sender, email_password)
         smtp.sendmail(email_sender, email_recever, em.as_string())
         
+   
         
 
         

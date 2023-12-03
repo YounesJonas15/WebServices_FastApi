@@ -38,17 +38,19 @@ async def solvabiliteClient(data: Demande):
 
         
         dettes = 0  
+        no_client = True
 
         for client in list_client:
             print(client["Email"])
             if client["Email"] == email:
                 # Récupérer le tuple (nom, prénom, email) correspondant
+                no_client = False
                 result_tuple = client
                 dettes = sum(result_tuple["Dete"])
                 break
 
         # Si le client n'est pas trouvé, retourner -1, sinon effectuer le calcul et retourner le résultat
-        if dettes == 0:
+        if no_client == True:
             response = {"score": -1}
             print(response)
             return response
