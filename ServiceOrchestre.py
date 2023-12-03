@@ -15,19 +15,11 @@ import ssl
 app = FastAPI()
 
 class Demande(BaseModel):
-    nom: str
-    prenom: str
-    ville: str
-    email: str
-    type_immobilier: str
-    montant: float
-    nombre_piece: int
-    revenu: float
-    depenses: float
+    file_path: str
 
 @app.post("/Orchestration/")
-async def orchestration(data: dict):
-    file_path = data.get("file_path")
+async def orchestration(data: Demande):
+    file_path = data.file_path
     print(file_path)
     
     #Extraction des information

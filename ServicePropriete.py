@@ -14,12 +14,19 @@ import ssl
 
 app = FastAPI()
 
+class Demande(BaseModel):
+    nombre_piece: int
+    ville: str
+    montant: float
+    type: str
+
+
 @app.get("/ServicePropriete/")
-async def proprieteClient(data: dict):
-        nombre_piece = data.get("nombre_piece")
-        ville = data.get("ville")
-        montant = data.get("montant")
-        type = data.get("type")
+async def proprieteClient(data: Demande):
+        nombre_piece = data.nombre_piece
+        ville = data.ville
+        montant = data.montant
+        type = data.type
         try:
             with open("ventes_recentes.json", "r") as f:
                 data = json.load(f)

@@ -5,9 +5,11 @@ import requests
 
 app = FastAPI()
 
+class Demande(BaseModel):
+    file_path: str
 @app.get("/extractionData/")
-async def Extract_donnee_client(data: dict):
-    file_path = data.get("file_path")
+async def Extract_donnee_client(data: Demande):
+    file_path = data.file_path
     print(file_path)
     print(file_path)
     try:

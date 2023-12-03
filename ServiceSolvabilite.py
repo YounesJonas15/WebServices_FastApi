@@ -14,12 +14,19 @@ import ssl
 
 app = FastAPI()
 
+class Demande(BaseModel):
+    email: str
+    montant: float
+    revenu: float
+    depenses: float
+
 @app.get("/ServiceSolvabilite/")
-async def solvabiliteClient(data: dict):
-        montant = data.get("montant")
-        revenu = data.get("revenu")
-        depenses = data.get("depenses")
-        email = data.get("email")
+async def solvabiliteClient(data: Demande):
+        email = data.email
+        montant = data.montant
+        revenu = data.revenu
+        depenses = data.depenses
+        
         print(email)
         list_client = []
         result_tuple = {}

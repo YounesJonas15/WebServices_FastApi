@@ -11,13 +11,15 @@ import ssl
 ##8005
 
 
-
+class Demande(BaseModel):
+    solvabilite_score: float
+    propriete_score: float
 app = FastAPI()
 
 @app.get("/ServiceDecision/")
-async def decisionClient(data: dict):
-        solvabilite = data.get("solvabilite_score")
-        priorite = data.get("propriete_score")
+async def decisionClient(data: Demande):
+        solvabilite = data.solvabilite_score
+        priorite = data.propriete_score
         if (solvabilite + priorite)/2 >= 0.5:
             return {"decision" : True}
         else : 
