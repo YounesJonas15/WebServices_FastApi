@@ -26,6 +26,14 @@
         "Dete": [200, 100]
     },
     {
+        "Nom du Client": "Maziz",
+        "Prenom du Client": "Yacine",
+        "Ville": "Lyon",
+        "Email": "mazizyassine25@gmail.com",
+        "Solde": 3000,
+        "Dete": [200, 100]
+    },
+    {
         "Nom du Client": "Camille",
         "Prenom du Client": "Martin",
         "Ville": "Nice",

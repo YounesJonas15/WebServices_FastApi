@@ -14,8 +14,9 @@ def listener(path):
             if added:
                 for file_name in added:
                     print(file_name)
-                    file_path = os.path.join(path, file_name)
+                    file_path = path + "/" + file_name
                     data = {"file_path" : file_path}
+                    print (data)
                     response = requests.post("http://127.0.0.1:8001/Orchestration/", json = data)
                     if response.status_code == 200:
                         print(f"File successfully sent.")
