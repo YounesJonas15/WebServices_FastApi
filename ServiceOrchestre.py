@@ -40,6 +40,7 @@ async def orchestration(data: dict):
     else:
         print(f"Failed to send file path to extraction service. Status code: {response.status_code}")
     
+
     # Service de solvabilite
     data = {
         "email" : demande["Email"],
@@ -73,7 +74,56 @@ async def orchestration(data: dict):
         "solvabilite_score" : solvabilite_score,
         "propriete_score" : propriete_score
     }
-    ##response = requests.get("http://127.0.0.1:8005/ServiceDecision/", json=data)
+    
+    response = requests.get("http://127.0.0.1:8005/ServiceDecision/", json=data)
+    decision = bool(response.json().get("decision"))
+
+    #enregistrement de la décision
+    nom =demande["Nom du Client"]
+    prenom = demande["Prenom du Client"]
+    email = demande["Email"]
+    file_name = f"{nom + prenom}.json"  
+    file_path = os.path.join("ResultatDemandes", file_name) 
+
+    resultat_data = {
+        "Nom du Client": nom,
+        "Prenom du Client": prenom,
+        "Email" : email,
+        "Reponse": "Pret accorde" if decision else "Pret refuse"
+    }
+
+    with open(file_path, "w") as f:
+        json.dump(resultat_data, f, indent=4)
+    
+    #Envoie du mail
+    email_sender = 'yassinesoatp@gmail.com'
+    email_password = 'ibyk omnw lzuh ytir'
+
+    email_recever = email
+
+    subject = "Décision final pour votre demande"
+    if(decision):
+        body ="Nous avons le plaisir de vous informer que votre demande de pret immobilier a été accordée "
+    else :
+        body = "Nous avons le regret de vous informer que votre demande de pret immobilier a été refusé"
+        
+    em = EmailMessage()
+    em['From'] = email_sender
+    em['To'] = email_recever
+    em['subject'] = subject
+    em.set_content(body)
+
+    context = ssl.create_default_context()
+
+    with smtplib.SMTP_SSL('smtp.gmail.com', 465, context=context) as smtp:
+        smtp.login(email_sender, email_password)
+        smtp.sendmail(email_sender, email_recever, em.as_string())
+        
+        
+
+        
+        
+        
     
 
     return {"message": "File path received successfully"}
