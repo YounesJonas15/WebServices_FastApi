@@ -1,13 +1,8 @@
 import json
-import os
-import sys
+
 from fastapi import FastAPI
 from pydantic import BaseModel
 import requests
-"""from suds.client import Client"""
-from email.message import EmailMessage
-import smtplib 
-import ssl
 ##8003
 
 
@@ -31,7 +26,7 @@ async def solvabiliteClient(data: Demande):
         list_client = []
         result_tuple = {}
         try:
-            with open("banque.json", "r") as f:
+            with open("./data/banque.json", "r") as f:
                 list_client = json.load(f)
         except (json.JSONDecodeError, FileNotFoundError):
             pass

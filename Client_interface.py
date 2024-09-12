@@ -1,5 +1,4 @@
 import requests
-from suds.client import Client
 import tkinter as tk
 
 url = "http://127.0.0.1:8000/reception_demande/"

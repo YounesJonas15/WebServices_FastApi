@@ -1,0 +1,7 @@
+fastapi
+pydantic
+requests
+uvicorn
+smtplib
+ssl
+python-dotenv

@@ -6,8 +6,6 @@ from pydantic import BaseModel
 import requests
 """from suds.client import Client"""
 from email.message import EmailMessage
-import smtplib 
-import ssl
 ##8005
 
 

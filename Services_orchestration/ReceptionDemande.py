@@ -33,7 +33,7 @@ async def recevoir_demande(demande: Demande):
 
     
     file_name = f"{demande.nom + demande.prenom}.json"
-    file_path = os.path.join("demandes", file_name)
+    file_path = os.path.join("./data/demandes", file_name)
 
     with open(file_path, "w") as f:
         json.dump(demande_data, f, indent=4)

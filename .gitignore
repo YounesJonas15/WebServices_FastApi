@@ -1,4 +1,5 @@
 demandes/
 __pycache__/
-__pycache__
-banque.json
+data/
+.env
+venv/

@@ -1,6 +1,5 @@
 import json
 import os
-import sys
 from fastapi import FastAPI
 from pydantic import BaseModel
 import requests
@@ -9,6 +8,9 @@ from email.message import EmailMessage
 import smtplib 
 import ssl
 
+from dotenv import load_dotenv
+
+load_dotenv()
 
 
 
@@ -84,7 +86,7 @@ async def orchestration(data: Demande):
     email = demande["Email"]
     if solvabilite_score != -1: 
         file_name = f"{nom + prenom}.json"  
-        file_path = os.path.join("ResultatDemandes", file_name) 
+        file_path = os.path.join("./data/ResultatDemandes", file_name) 
 
         resultat_data = {
             "Nom du Client": nom,
@@ -96,9 +98,9 @@ async def orchestration(data: Demande):
         with open(file_path, "w") as f:
             json.dump(resultat_data, f, indent=4)
     
-    #Envoie du mail
-    email_sender = 'yassinesoatp@gmail.com'
-    email_password = 'ibyk omnw lzuh ytir'
+    # Envoi du mail
+    email_sender = os.getenv('EMAIL_SENDER')
+    email_password = os.getenv('EMAIL_PASSWORD')
 
     email_recever = email
 
@@ -125,13 +127,6 @@ async def orchestration(data: Demande):
         smtp.sendmail(email_sender, email_recever, em.as_string())
         
    
-        
-
-        
-        
-        
-    
-
     return {"message": "File path received successfully"}
 
 
